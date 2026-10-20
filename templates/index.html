@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BFS vs A* - TD Ethique IA</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+<div class="min-h-screen">
+<header class="bg-white shadow">
+<div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+<h1 class="text-xl font-bold">TD Ethique IA - BFS vs A*</h1>
+<span class="text-sm text-slate-500">ENSA Tanger - GINF2</span>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-4 py-8">
+<div class="grid md:grid-cols-3 gap-6">
+<div class="md:col-span-3 bg-white rounded-xl shadow p-6">
+<h2 class="text-lg font-semibold mb-4">Comparaison des performances</h2>
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm">
+<thead class="bg-slate-100">
+<tr>
+<th class="px-3 py-2 text-left">Grille</th>
+<th class="px-3 py-2 text-left">Algo</th>
+<th class="px-3 py-2">Nœuds explorés</th>
+<th class="px-3 py-2">Temps s</th>
+<th class="px-3 py-2">Longueur chemin</th>
+</tr>
+</thead>
+<tbody>
+{% for r in results %}
+<tr class="border-t">
+<td class="px-3 py-2 font-medium">{{ r.size }}x{{ r.size }}</td>
+<td class="px-3 py-2">BFS</td>
+<td class="px-3 py-2 text-center">{{ r.bfs_explored }}</td>
+<td class="px-3 py-2 text-center">{{ r.bfs_time }}</td>
+<td class="px-3 py-2 text-center">{{ r.bfs_path_len }}</td>
+</tr>
+<tr class="border-t bg-slate-50">
+<td class="px-3 py-2"></td>
+<td class="px-3 py-2">A*</td>
+<td class="px-3 py-2 text-center">{{ r.astar_explored }}</td>
+<td class="px-3 py-2 text-center">{{ r.astar_time }}</td>
+<td class="px-3 py-2 text-center">{{ r.astar_path_len }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+</div>
+{% for r in results %}
+<div class="bg-white rounded-xl shadow p-4">
+<h3 class="font-semibold mb-2">Grille {{ r.size }}x{{ r.size }}</h3>
+<img src="/static/{{ r.image }}" class="rounded border" alt="visualisation">
+<p class="text-xs text-slate-500 mt-2">Murs noirs, départ vert, arrivée jaune, explorés gris, chemin blanc</p>
+</div>
+{% endfor %}
+</div>
+
+<div class="mt-8 bg-white rounded-xl shadow p-6">
+<h2 class="text-lg font-semibold mb-3">Réponses aux questions</h2>
+<div class="space-y-4 text-sm">
+<div>
+<h4 class="font-medium">Pourquoi A* est plus efficace ?</h4>
+<p>A* oriente la recherche vers le but grâce à f(n)=g(n)+h(n). Il explore moins de nœuds en priorisant les chemins prometteurs, contrairement à BFS qui explore en couches uniformes.</p>
+</div>
+<div>
+<h4 class="font-medium">Rôle de la fonction heuristique ?</h4>
+<p>h(n) estime le coût restant jusqu'au but. Si admissible (ne surestime jamais), A* garantit l'optimalité. Plus h est précise, plus la recherche est rapide. h=0 → Dijkstra.</p>
+</div>
+<div>
+<h4 class="font-medium">Quand BFS reste-t-il préférable ?</h4>
+<p>Quand aucune heuristique fiable n'existe, graphe non pondéré petit, besoin de garantie simple sans heuristique, ou plusieurs buts inconnus. BFS est simple et optimal sur coûts unitaires.</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body>
+</html>
