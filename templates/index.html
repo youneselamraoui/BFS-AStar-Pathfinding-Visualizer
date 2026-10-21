@@ -51,11 +51,11 @@
 </div>
 </div>
 {% for r in results %}
-<div class="bg-white rounded-xl shadow p-4">
-<h3 class="font-semibold mb-2">Grille {{ r.size }}x{{ r.size }}</h3>
-<img src="/static/{{ r.image }}" class="rounded border" alt="visualisation">
-<p class="text-xs text-slate-500 mt-2">Murs noirs, départ vert, arrivée jaune, explorés gris, chemin blanc</p>
-</div>
+  <div class="bg-white rounded-xl shadow p-4">
+    <h3 class="font-semibold mb-2">Grille {{ r.size }}x{{ r.size }}</h3>
+    <img src="/static/{{ r.image }}" class="rounded border" alt="visualisation">
+    <p class="text-xs text-slate-500 mt-2">Libre blanc, murs noirs, explorés bleu clair, chemin rouge, départ vert, arrivée jaune</p>
+  </div>
 {% endfor %}
 </div>
 
