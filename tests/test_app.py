@@ -6,10 +6,11 @@ def test_index_route_returns_200():
     resp = client.get('/')
     assert resp.status_code == 200
 
-def test_index_contains_three_grids():
+def test_index_contains_dynamic_elements():
     client = app.app.test_client()
     resp = client.get('/')
     html = resp.get_data(as_text=True)
-    assert '20x20' in html
-    assert '50x50' in html
-    assert '100x100' in html
+    # presence of two canvases
+    assert html.count('<canvas') >= 2
+    assert 'Comparer les deux' in html
+    assert '<script src="/static/app.js"></script>' in html

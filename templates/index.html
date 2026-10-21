@@ -14,19 +14,91 @@
 <span class="text-sm text-slate-500">ENSA Tanger - GINF2</span>
 </div>
 </header>
-<main class="max-w-7xl mx-auto px-4 py-8">
-<div class="grid md:grid-cols-1 gap-6">
+<main class="max-w-7xl mx-auto px-4 py-8 space-y-6">
+<div id="error-banner" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded"></div>
+
+<!-- 1 Implémentation -->
 <div class="bg-white rounded-xl shadow p-6">
-<h2 class="text-lg font-semibold mb-3">Paramètres de l'expérience</h2>
-<ul class="text-sm list-disc pl-5 space-y-1">
-<li>Densité de murs : 0.2</li>
-<li>Seeds : 20, 50, 100</li>
-<li>Heuristique : Manhattan</li>
-<li>Mouvement : 4 directions</li>
-</ul>
+<h2 class="text-lg font-semibold mb-4">Implémentation</h2>
+<div class="grid md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm mb-1">Taille</label>
+<input id="size-input" type="number" min="10" max="100" value="30" class="w-full border rounded px-2 py-1">
 </div>
+<div>
+<label class="block text-sm mb-1">Densité de murs</label>
+<input id="density-input" type="range" min="0" max="35" value="20" class="w-full">
+<span id="density-val" class="text-sm text-slate-600">20%</span>
+</div>
+<div>
+<label class="block text-sm mb-1">Seed</label>
+<div class="flex gap-2">
+<input id="seed-input" type="text" placeholder="vide = aléatoire" class="flex-1 border rounded px-2 py-1">
+<button id="btn-random" class="px-3 py-1 bg-slate-200 rounded">Grille aléatoire</button>
+</div>
+</div>
+<div>
+<label class="block text-sm mb-1">Heuristique A*</label>
+<select id="heuristic-select" class="w-full border rounded px-2 py-1">
+<option value="manhattan">manhattan</option>
+<option value="euclidean">euclidean</option>
+<option value="chebyshev">chebyshev</option>
+<option value="zero">zero</option>
+</select>
+</div>
+<div>
+<label class="block text-sm mb-1">Vitesse d'animation</label>
+<input id="speed-input" type="range" min="10" max="100" value="50" class="w-full">
+<span id="speed-val" class="text-sm text-slate-600">50</span>
+</div>
+<div class="flex gap-2 pt-4">
+<button id="btn-generate" class="px-3 py-1 bg-blue-600 text-white rounded">Générer</button>
+<button id="btn-bfs" class="px-3 py-1 bg-green-600 text-white rounded">Lancer BFS</button>
+<button id="btn-astar" class="px-3 py-1 bg-purple-600 text-white rounded">Lancer A*</button>
+<button id="btn-compare" class="px-3 py-1 bg-indigo-600 text-white rounded">Comparer les deux</button>
+<button id="btn-reset" class="px-3 py-1 bg-slate-300 rounded">Réinitialiser</button>
+</div>
+</div>
+</div>
+
+<!-- 2 Visualisation -->
 <div class="bg-white rounded-xl shadow p-6">
-<h2 class="text-lg font-semibold mb-4">Comparaison des performances</h2>
+<h2 class="text-lg font-semibold mb-4">Visualisation du parcours</h2>
+<div class="flex gap-2 mb-3">
+<button id="mode-wall" class="px-3 py-1 bg-slate-200 rounded">Mur</button>
+<button id="mode-start" class="px-3 py-1 bg-slate-200 rounded">Départ</button>
+<button id="mode-goal" class="px-3 py-1 bg-slate-200 rounded">Arrivée</button>
+</div>
+<div class="grid md:grid-cols-2 gap-6">
+<div>
+<h3 class="font-medium mb-2">BFS</h3>
+<canvas id="canvas-bfs" class="border rounded w-full"></canvas>
+<div class="text-sm mt-2 grid grid-cols-4 gap-2">
+<div>Nœuds : <span id="bfs-nodes">0</span></div>
+<div>Temps : <span id="bfs-time">—</span></div>
+<div>Longueur : <span id="bfs-len">—</span></div>
+<div>État : <span id="bfs-state">idle</span></div>
+</div>
+<button id="btn-pause-bfs" class="mt-2 px-3 py-1 bg-slate-200 rounded">Pause</button>
+</div>
+<div>
+<h3 class="font-medium mb-2">A*</h3>
+<canvas id="canvas-astar" class="border rounded w-full"></canvas>
+<div class="text-sm mt-2 grid grid-cols-4 gap-2">
+<div>Nœuds : <span id="astar-nodes">0</span></div>
+<div>Temps : <span id="astar-time">—</span></div>
+<div>Longueur : <span id="astar-len">—</span></div>
+<div>État : <span id="astar-state">idle</span></div>
+</div>
+<button id="btn-pause-astar" class="mt-2 px-3 py-1 bg-slate-200 rounded">Pause</button>
+</div>
+</div>
+<p class="text-xs text-slate-500 mt-3">Libre blanc, murs noirs, explorés bleu clair, chemin rouge, départ vert, arrivée jaune. Clic/glisser pour modifier.</p>
+</div>
+
+<!-- 3 Tableau comparatif -->
+<div class="bg-white rounded-xl shadow p-6">
+<h2 class="text-lg font-semibold mb-4">Tableau comparatif des performances</h2>
 <div class="overflow-x-auto">
 <table class="min-w-full text-sm">
 <thead class="bg-slate-100">
@@ -36,42 +108,17 @@
 <th class="px-3 py-2">Nœuds explorés</th>
 <th class="px-3 py-2">Temps (ms)</th>
 <th class="px-3 py-2">Longueur chemin</th>
-<th class="px-3 py-2">Réduction de nœuds %</th>
 </tr>
 </thead>
-<tbody>
-{% for r in results %}
-<tr class="border-t">
-<td class="px-3 py-2 font-medium">{{ r.size }}x{{ r.size }}</td>
-<td class="px-3 py-2">BFS</td>
-<td class="px-3 py-2 text-center">{{ r.bfs_explored }}</td>
-<td class="px-3 py-2 text-center">{{ r.bfs_time }}</td>
-<td class="px-3 py-2 text-center">{{ r.bfs_path_len }}</td>
-<td class="px-3 py-2 text-center"></td>
-</tr>
-<tr class="border-t bg-slate-50">
-<td class="px-3 py-2"></td>
-<td class="px-3 py-2">A*</td>
-<td class="px-3 py-2 text-center">{{ r.astar_explored }}</td>
-<td class="px-3 py-2 text-center">{{ r.astar_time }}</td>
-<td class="px-3 py-2 text-center">{{ r.astar_path_len }}</td>
-<td class="px-3 py-2 text-center">{{ r.reduction }}%</td>
-</tr>
-{% endfor %}
+<tbody id="perf-body">
+<tr><td colspan="5" class="px-3 py-2 text-slate-500">Aucune donnée</td></tr>
 </tbody>
 </table>
 </div>
 </div>
-{% for r in results %}
-  <div class="bg-white rounded-xl shadow p-4">
-    <h3 class="font-semibold mb-2">Grille {{ r.size }}x{{ r.size }}</h3>
-    <img src="/static/{{ r.image }}" class="rounded border" alt="visualisation">
-    <p class="text-xs text-slate-500 mt-2">Libre blanc, murs noirs, explorés bleu clair, chemin rouge, départ vert, arrivée jaune</p>
-  </div>
-{% endfor %}
-</div>
 
-<div class="mt-8 bg-white rounded-xl shadow p-6">
+<!-- 4 Réponses aux questions -->
+<div class="bg-white rounded-xl shadow p-6">
 <h2 class="text-lg font-semibold mb-3">Réponses aux questions</h2>
 <div class="space-y-4 text-sm">
 <div>
@@ -88,19 +135,8 @@
 </div>
 </div>
 </div>
-
-<div class="mt-8 bg-white rounded-xl shadow p-6">
-<h2 class="text-lg font-semibold mb-3">Observation expérimentale</h2>
-<div class="space-y-3 text-sm">
-{% for r in results %}
-<div>
-<h4 class="font-medium">Grille {{ r.size }}x{{ r.size }}</h4>
-<p>{{ r.observation }}</p>
-</div>
-{% endfor %}
-</div>
-</div>
 </main>
 </div>
+<script src="/static/app.js"></script>
 </body>
 </html>

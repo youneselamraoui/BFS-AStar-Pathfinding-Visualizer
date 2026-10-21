@@ -55,12 +55,12 @@ def bfs(grid: Grid, start: Pos, goal: Pos) -> SearchResult:
         visited_order=visited_order
     )
 
-def astar(grid: Grid, start: Pos, goal: Pos) -> SearchResult:
+def astar(grid: Grid, start: Pos, goal: Pos, heuristic=manhattan) -> SearchResult:
     from itertools import count
     counter = count()
     open_set: List[Tuple[int, int, int, Pos]] = []
-    h_start = manhattan(start, goal)
-    heapq.heappush(open_set, (h_start, h_start, next(counter), start))
+    h_start = heuristic(start, goal)
+    heapq.heappush(open_set, (h_start + 0, h_start, next(counter), start))
     came_from: Dict[Pos, Pos | None] = {start: None}
     g_score: Dict[Pos, int] = {start: 0}
     closed_set: set[Pos] = set()
@@ -83,7 +83,7 @@ def astar(grid: Grid, start: Pos, goal: Pos) -> SearchResult:
             if nb not in g_score or tentative_g < g_score[nb]:
                 came_from[nb] = current
                 g_score[nb] = tentative_g
-                h_nb = manhattan(nb, goal)
+                h_nb = heuristic(nb, goal)
                 f_nb = tentative_g + h_nb
                 heapq.heappush(open_set, (f_nb, h_nb, next(counter), nb))
                 if nb not in closed_set:
