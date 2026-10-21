@@ -5,7 +5,7 @@ Comparaison interactive d’une recherche exacte en largeur **BFS** et d’une r
 ## Structure du projet
 
 ```
-BFS_Astar_TD/
+BFS-AStar-Pathfinding-Visualizer/
 ├─ backend/
 │  ├─ app.py                # API Flask + rendu template
 │  ├─ src/pathfinding/      # BFS, A*, heuristiques, grille, métriques
@@ -47,7 +47,8 @@ BFS_Astar_TD/
 ## Démarrage rapide – Docker
 
 ```bash
-cd BFS_Astar_TD
+cd BFS-AStar-Pathfinding-Visualizer
+
 docker compose up --build
 ```
 Accès : http://localhost:5000
