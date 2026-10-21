@@ -111,3 +111,11 @@ def test_generate_grid_guarantees_path():
     grid = generate_grid(15, obstacle_ratio=0.3, seed=7)
     res = bfs(grid, (0,0), (14,14))
     assert res.path, "generate_grid doit garantir un chemin"
+
+
+def test_astar_empty_grid_tie_breaking_limit():
+    grid = np.zeros((50,50), dtype=int)
+    res_bfs = bfs(grid, (0,0), (49,49))
+    res_astar = astar(grid, (0,0), (49,49))
+    assert res_astar.cost == res_bfs.cost
+    assert res_astar.nodes_expanded <= 150

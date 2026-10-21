@@ -5,6 +5,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+from statistics import median
 from src.pathfinding.grid import generate_grid
 from src.pathfinding.algorithms import bfs, astar
 
@@ -14,7 +15,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def visualize(grid, bfs_res, astar_res, size, idx):
     # Create visualization for BFS and A* with clear colors
-    fig, axes = plt.subplots(1,2, figsize=(12,6))
+    fig, axes = plt.subplots(1,2, figsize=(14,7))
     cmap = ListedColormap(['white', 'black', '#add8e6', '#ff0000', '#00cc00', '#ffff00'])
     start = (0,0)
     goal = (grid.shape[0]-1, grid.shape[1]-1)
@@ -31,7 +32,7 @@ def visualize(grid, bfs_res, astar_res, size, idx):
         img_cat[start] = 4
         img_cat[goal] = 5
         ax.imshow(img_cat, cmap=cmap, vmin=0, vmax=5, interpolation='nearest')
-        ax.set_title(f'{title} - exploré {len(visited)}')
+        ax.set_title(f'{title} : {len(visited)} nœuds explorés', fontsize=14)
         ax.axis('off')
     plt.tight_layout()
     path_img = os.path.join(OUTPUT_DIR, f'grid_{size}_{idx}.png')
@@ -46,17 +47,34 @@ def build_results():
         grid = generate_grid(size, obstacle_ratio=0.2, seed=size)
         start = (0,0)
         goal = (size-1,size-1)
-        bfs_res = bfs(grid, start, goal)
-        astar_res = astar(grid, start, goal)
+        # 10 runs for median time
+        bfs_runs = [bfs(grid, start, goal) for _ in range(10)]
+        astar_runs = [astar(grid, start, goal) for _ in range(10)]
+        bfs_res = bfs_runs[0]
+        astar_res = astar_runs[0]
         visualize(grid, bfs_res, astar_res, size, i)
+        bfs_time_ms = round(median(r.time_ms for r in bfs_runs), 3)
+        astar_time_ms = round(median(r.time_ms for r in astar_runs), 3)
+        reduction = 0.0
+        if bfs_res.nodes_expanded > 0:
+            reduction = round((1 - astar_res.nodes_expanded / bfs_res.nodes_expanded) * 100, 1)
+        if astar_res.nodes_expanded < bfs_res.nodes_expanded:
+            if astar_time_ms >= bfs_time_ms:
+                observation = f"Sur {size}x{size}, A* explore {astar_res.nodes_expanded} nœuds contre {bfs_res.nodes_expanded} pour BFS, soit une réduction de {reduction}%, mais le temps médian est {astar_time_ms} ms contre {bfs_time_ms} ms : le coût du tas O(log n) compense le gain sur cette taille."
+            else:
+                observation = f"Sur {size}x{size}, A* explore {astar_res.nodes_expanded} nœuds contre {bfs_res.nodes_expanded} pour BFS, soit une réduction de {reduction}%, et est aussi plus rapide en temps {astar_time_ms} ms contre {bfs_time_ms} ms."
+        else:
+            observation = f"Sur {size}x{size}, A* n’apporte pas de gain en nombre de nœuds explorés."
         data.append({
             'size': size,
             'bfs_explored': bfs_res.nodes_expanded,
             'astar_explored': astar_res.nodes_expanded,
-            'bfs_time': round(bfs_res.time_ms/1000,4),
-            'astar_time': round(astar_res.time_ms/1000,4),
+            'bfs_time': bfs_time_ms,
+            'astar_time': astar_time_ms,
             'bfs_path_len': bfs_res.cost,
             'astar_path_len': astar_res.cost,
+            'reduction': reduction,
+            'observation': observation,
             'image': f'output/grid_{size}_{i}.png'
         })
     return data

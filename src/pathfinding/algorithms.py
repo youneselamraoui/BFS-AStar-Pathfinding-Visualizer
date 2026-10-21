@@ -56,8 +56,11 @@ def bfs(grid: Grid, start: Pos, goal: Pos) -> SearchResult:
     )
 
 def astar(grid: Grid, start: Pos, goal: Pos) -> SearchResult:
-    open_set: List[Tuple[int, int, Pos]] = []
-    heapq.heappush(open_set, (manhattan(start, goal), 0, start))
+    from itertools import count
+    counter = count()
+    open_set: List[Tuple[int, int, int, Pos]] = []
+    h_start = manhattan(start, goal)
+    heapq.heappush(open_set, (h_start, h_start, next(counter), start))
     came_from: Dict[Pos, Pos | None] = {start: None}
     g_score: Dict[Pos, int] = {start: 0}
     closed_set: set[Pos] = set()
@@ -67,20 +70,22 @@ def astar(grid: Grid, start: Pos, goal: Pos) -> SearchResult:
     start_time = time.perf_counter()
     while open_set:
         max_frontier = max(max_frontier, len(open_set))
-        _, current_g, current = heapq.heappop(open_set)
+        f, h, _, current = heapq.heappop(open_set)
         if current in closed_set:
             continue
         closed_set.add(current)
         visited_order.append(current)
         if current == goal:
             break
+        current_g = g_score[current]
         for nb in get_neighbors(current, grid):
-            tentative_g = g_score[current] + 1
+            tentative_g = current_g + 1
             if nb not in g_score or tentative_g < g_score[nb]:
                 came_from[nb] = current
                 g_score[nb] = tentative_g
-                f = tentative_g + manhattan(nb, goal)
-                heapq.heappush(open_set, (f, tentative_g, nb))
+                h_nb = manhattan(nb, goal)
+                f_nb = tentative_g + h_nb
+                heapq.heappush(open_set, (f_nb, h_nb, next(counter), nb))
                 if nb not in closed_set:
                     nodes_generated += 1
     elapsed_ms = (time.perf_counter() - start_time) * 1000
