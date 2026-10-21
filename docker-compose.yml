@@ -5,4 +5,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./static:/app/static
+      - ./frontend/src/static:/app/frontend/src/static
+      - ./frontend/src/templates:/app/frontend/src/templates
+    environment:
+      - PYTHONUNBUFFERED=1

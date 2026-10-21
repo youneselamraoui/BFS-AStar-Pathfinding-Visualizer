@@ -1,34 +1,115 @@
-# TD Ethique IA - Comparaison BFS vs A*
+# BFS vs A* – TD Éthique IA
 
-## Contexte
-Comparaison d'un algorithme exact BFS et heuristique A* sur problème de recherche de chemin dans une grille.
+Comparaison interactive d’une recherche exacte en largeur **BFS** et d’une recherche heuristique **A*** sur un problème de cheminement dans une grille. Interface avec sidebar repliable, cartes, tableau comparatif, charts Chart.js et thème Tailwind v4.
 
 ## Structure du projet
-- `bfs_astar.py` : implémentation BFS et A* avec compteurs
-- `app.py` : Flask serving page avec Tailwind
-- `templates/index.html` : frontend style inspiré de Management_Demande (Tailwind, cards, tableau)
-- `static/output/` : images générées
-- `Dockerfile` + `docker-compose.yml`
 
-## Lancement
+```
+BFS_Astar_TD/
+├─ backend/
+│  ├─ app.py                # API Flask + rendu template
+│  ├─ src/pathfinding/      # BFS, A*, heuristiques, grille, métriques
+│  ├─ tests/                # tests pytest
+│  ├─ requirements.txt
+│  └─ Dockerfile
+├─ frontend/
+│  ├─ src/
+│  │  ├─ static/            # CSS, JS, images, output
+│  │  └─ templates/         # index.html
+│  ├─ tailwind/             # input.css, thème OKLCH
+│  ├─ package.json
+│  └─ ...
+├─ docker-compose.yml
+├─ .gitignore
+└─ README.md
+```
+
+### Backend
+* Flask expose `/`, `/api/grid`, `/api/run`, `/health`
+* Génération de grille avec densité et seed reproductible
+* Exécution BFS et A* avec comptage nœuds, temps médian, longueur chemin
+* Visualisations Matplotlib sauvegardées dans `frontend/src/static/output/`
+
+### Frontend
+* Tailwind v4 avec variables CSS personnalisées
+* Sidebar repliable persistante, navigation par ancres, breadcrumb
+* 4 stat cards : Grille, Heuristique, Nœuds BFS, Nœuds A*
+* Section Implémentation : taille, densité, seed, heuristique, vitesse animation
+* Section Visualisation : deux canvas côte à côte, modes Mur/Départ/Arrivée, pause
+* Section Comparaison : tableau historique, benchmark rapide, export CSV, charts nœuds/temps
+* Thème : `bg-background`, `text-muted-foreground`, `rounded-2xl`, `border-border`, palette succès/warning
+
+## Prérequis
+
+* Docker + Docker Compose **ou**
+* Python 3.11+, Node 18+, pip, npm
+
+## Démarrage rapide – Docker
+
 ```bash
+cd BFS_Astar_TD
 docker compose up --build
 ```
-Accès http://localhost:5000
+Accès : http://localhost:5000
 
-## Résultats attendus
-Tableau comparatif : nœuds explorés, temps d'exécution, longueur chemin.
-Visualisation côte à côte BFS / A*.
+Le build copie `backend/` et `frontend/`, monte `frontend/src/static` et `frontend/src/templates` pour le développement.
 
-## Réponses théoriques
-**Pourquoi A* est plus efficace ?**
-Il oriente la recherche vers le but via f(n)=g(n)+h(n), donc explore moins de nœuds que BFS qui étend en largeur uniforme.
+## Démarrage local sans Docker
 
-**Rôle de la fonction heuristique ?**
-Estime le coût restant. Si admissible, A* reste optimal. Plus elle est précise, plus la recherche est rapide. h=0 → Dijkstra.
+### Backend
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate   # Windows
+pip install -r requirements.txt
+python app.py
+```
+API sur http://localhost:5000
 
-**Quand BFS reste préférable ?**
-Pas d'heuristique fiable, graphe petit/ coûts unitaires, besoin de garantie simple sans dépendre de h, plusieurs buts inconnus.
+### Frontend – build Tailwind
+```bash
+cd frontend
+npm install
+npm run build   # génère frontend/src/static/css/app.css
+```
+Le serveur Flask sert déjà les fichiers statiques depuis `frontend/src/static`.
 
-## Note
-Impossible de lire `C:\Users\youne\Downloads\TD2.pdf` : ce modèle ne supporte pas l'entrée PDF.
+### Tests
+```bash
+cd backend
+pytest -q
+```
+45 tests passent : routes, API grid/run, UI éléments.
+
+## Utilisation
+
+1. **Implémentation** : régler taille, densité, seed, heuristique `manhattan/euclidean/chebyshev/zero`, vitesse.
+2. **Générer** une grille, modifier mur/départ/arrivée par clic/glisser.
+3. **Lancer BFS / A* / Comparer** : animation de l’exploration, compteurs nœuds/temps/longueur.
+4. **Tableau comparatif** : historique des runs, réduction % A* vs BFS, export CSV.
+5. **Benchmark rapide** : 20/50/100, 10 runs médianes, mise à jour des charts.
+
+## Concepts clés
+
+* **BFS** : exploration en largeur uniforme, optimal sur coûts unitaires, file O(1).
+* **A*** : f(n)=g(n)+h(n), explore moins de nœuds avec heuristique admissible.
+* **Heuristique** :
+  * manhattan → grille Manhattan
+  * euclidean → distance euclidienne
+  * chebyshev → diagonales autorisées
+  * zero → Dijkstra
+* Quand BFS reste préférable : absence d’heuristique fiable, petit graphe, besoin de simplicité.
+
+## Développement
+
+* Modifier le thème : `frontend/tailwind/input.css`
+* Modifier l’UI : `frontend/src/templates/index.html`, `frontend/src/static/app.js`, `frontend/src/static/ui.js`
+* Ajouter tests : `backend/tests/`
+
+## .gitignore
+
+Python, venv, `__pycache__`, `.pytest_cache`, `node_modules/`, `dist/`, `.vscode/`, `static/output/*.png`, etc.
+
+## Licence
+
+Projet académique TD Éthique IA.

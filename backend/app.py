@@ -10,9 +10,15 @@ from src.pathfinding.grid import generate_grid
 from src.pathfinding.algorithms import bfs, astar
 from src.pathfinding.heuristics import manhattan, euclidean, chebyshev, zero
 
-app = Flask(__name__, static_folder='static', template_folder='templates')
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+FRONTEND_DIR = os.path.join(BASE_DIR, 'frontend')
+SRC_DIR = os.path.join(FRONTEND_DIR, 'src')
+STATIC_DIR = os.path.join(SRC_DIR, 'static')
+TEMPLATES_DIR = os.path.join(SRC_DIR, 'templates')
+
+app = Flask(__name__, static_folder=STATIC_DIR, template_folder=TEMPLATES_DIR)
 app.config['MAX_CONTENT_LENGTH'] = 1_000_000
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), 'static', 'output')
+OUTPUT_DIR = os.path.join(STATIC_DIR, 'output')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 @app.errorhandler(400)

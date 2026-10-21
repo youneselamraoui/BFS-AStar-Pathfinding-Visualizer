@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="/static/img/ECI.png" />
+<title>BFS vs A* - TD Ethique IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+<link rel="stylesheet" href="/static/css/app.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-background text-foreground antialiased">
+<svg class="hidden" aria-hidden="true">
+  <defs>
+    <symbol id="icon-dashboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></symbol>
+    <symbol id="icon-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></symbol>
+    <symbol id="icon-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></symbol>
+    <symbol id="icon-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+    <symbol id="icon-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="icon-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+    <symbol id="icon-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></symbol>
+    <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="icon-more" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+    <symbol id="icon-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+    <symbol id="icon-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m16.24 7.76-1.804 5.411a2 2 0 0 1-1.265 1.265L7.76 16.24l1.804-5.411a2 2 0 0 1 1.265-1.265z"/><circle cx="12" cy="12" r="10"/></symbol>
+    <symbol id="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+    <symbol id="icon-compare" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></symbol>
+    <symbol id="icon-gauge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></symbol>
+    <symbol id="icon-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+  </defs>
+</svg>
+
+<div class="flex min-h-screen bg-background">
+  <div id="sidebar-overlay" class="fixed inset-0 z-30 hidden bg-black/30 backdrop-blur-sm lg:hidden"></div>
+
+  <aside id="sidebar" class="hidden lg:flex shrink-0 flex-col border-r border-sidebar-border bg-sidebar p-4 fixed lg:sticky inset-y-0 left-0 z-40 h-screen overflow-y-auto scrollbar-hide transition-all duration-300 w-64">
+    <div class="flex items-center justify-between gap-2">
+      <a href="#top" class="min-w-0 flex-1">
+        
+      </a>
+      <button id="sidebar-close" class="grid lg:hidden size-7 place-items-center rounded-md border border-sidebar-border bg-card text-muted-foreground hover:bg-muted">
+        <svg class="size-4"><use href="#icon-x" /></svg>
+      </button>
+    </div>
+
+    <div class="collapse-hide mt-4 flex items-center gap-2 rounded-lg border border-sidebar-border px-3 py-2 text-sm text-muted-foreground">
+      <svg class="size-4"><use href="#icon-search" /></svg>
+      <input type="text" placeholder="Rechercher..." class="min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground" />
+    </div>
+    <div class="collapse-show mt-4 justify-center">
+      <button title="Rechercher" class="grid size-9 place-items-center rounded-lg border border-sidebar-border text-muted-foreground hover:bg-muted">
+        <svg class="size-4"><use href="#icon-search" /></svg>
+      </button>
+    </div>
+
+    <p class="sidebar-label px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Espace de travail</p>
+    <nav class="space-y-1">
+      <a href="#implementation" data-nav="implementation" class="sidebar-link is-active flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted"><svg class="size-4 shrink-0"><use href="#icon-sliders" /></svg><span class="flex-1 text-left">Implémentation</span></a>
+      <a href="#visualisation" data-nav="visualisation" class="sidebar-link flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted"><svg class="size-4 shrink-0"><use href="#icon-grid" /></svg><span class="flex-1 text-left">Visualisation</span></a>
+      <a href="#comparaison" data-nav="comparaison" class="sidebar-link flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted"><svg class="size-4 shrink-0"><use href="#icon-chart" /></svg><span class="flex-1 text-left">Comparaison</span></a>
+    </nav>
+
+    <p class="sidebar-label px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Ressources</p>
+    <nav class="space-y-1">
+      <a href="#comparaison" data-nav="comparaison" class="sidebar-link flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted"><svg class="size-4 shrink-0"><use href="#icon-gauge" /></svg><span class="flex-1 text-left">Benchmark</span></a>
+      <a href="#observation" data-nav="observation" class="sidebar-link flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-muted"><svg class="size-4 shrink-0"><use href="#icon-help" /></svg><span class="flex-1 text-left">Aide</span></a>
+    </nav>
+
+    <div class="collapse-hide mt-auto rounded-2xl bg-primary p-5 text-center text-primary-foreground">
+      <div class="mx-auto grid size-12 place-items-center rounded-full bg-primary-foreground/15">
+        <svg class="size-6"><use href="#icon-help" /></svg>
+      </div>
+      <p class="mt-3 font-bold">Besoin d'aide ?</p>
+      <p class="mt-1 text-xs opacity-80">Comprendre le rôle de l'heuristique et lire les résultats du benchmark.</p>
+      <a href="#observation" class="mt-4 block w-full rounded-lg bg-primary-foreground/15 py-2 text-sm font-semibold hover:bg-primary-foreground/25">Voir l'analyse</a>
+    </div>
+    <div class="collapse-show mt-auto justify-center pb-2">
+      <a href="#observation" title="Besoin d'aide ?" class="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+        <svg class="size-5"><use href="#icon-help" /></svg>
+      </a>
+    </div>
+  </aside>
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card px-6 py-4 lg:px-10">
+      <div class="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+        <button id="sidebar-open" class="grid lg:hidden size-8 shrink-0 place-items-center rounded-md border border-border text-muted-foreground hover:bg-muted">
+          <svg class="size-4"><use href="#icon-menu" /></svg>
+        </button>
+        <button id="sidebar-toggle" title="Replier" class="hidden lg:grid size-8 shrink-0 place-items-center rounded-md border border-border text-muted-foreground hover:bg-muted hover:text-foreground mr-1">
+          <svg id="sidebar-toggle-icon" class="size-4 transition-transform duration-300"><use href="#icon-chevron-left" /></svg>
+        </button>
+        <span class="hidden sm:inline">BFS vs A*</span>
+        <span class="hidden text-muted-foreground/60 sm:inline">›</span>
+        <span class="hidden sm:inline">TD Ethique</span>
+        <span class="hidden text-muted-foreground/60 sm:inline">›</span>
+        <strong id="breadcrumb-current" class="truncate font-semibold text-foreground">Implémentation</strong>
+      </div>
+
+    </header>
+
+    <main class="min-w-0 flex-1 space-y-6 bg-white p-6 lg:p-10">
+      <div id="top" class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-extrabold tracking-tight">BFS vs A*</h1>
+          <p class="mt-1 text-sm text-muted-foreground">Comparez une recherche exacte en largeur avec A* heuristique sur une grille de cheminement.</p>
+        </div>
+        <div class="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-muted-foreground shadow-[var(--shadow-card)]">
+          <span class="size-2 rounded-full bg-success"></span>
+          API connectée
+        </div>
+      </div>
+
+      <div id="error-banner" class="hidden rounded-xl border border-destructive/30 bg-danger-soft px-4 py-3 text-sm font-medium text-destructive"></div>
+
+      <section class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-2xl border border-border p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground"><svg class="size-4"><use href="#icon-grid" /></svg></div>
+              <span class="text-sm text-muted-foreground">Grille</span>
+            </div>
+            <svg class="size-4 text-muted-foreground"><use href="#icon-more" /></svg>
+          </div>
+          <p id="stat-grid" class="mt-4 text-[32px] font-extrabold leading-none tracking-tight">30 × 30</p>
+          <p id="stat-grid-note" class="mt-2 text-[11px] text-muted-foreground">20 % de murs · seed 42</p>
+        </div>
+
+        <div class="rounded-2xl border border-border p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground"><svg class="size-4"><use href="#icon-compass" /></svg></div>
+              <span class="text-sm text-muted-foreground">Heuristique</span>
+            </div>
+            <svg class="size-4 text-muted-foreground"><use href="#icon-more" /></svg>
+          </div>
+          <p id="stat-heuristic" class="mt-4 truncate text-2xl font-extrabold leading-none tracking-tight">Manhattan</p>
+          <p class="mt-2 text-[11px] text-muted-foreground">Guidage de la recherche A*</p>
+        </div>
+
+        <div class="rounded-2xl border border-border p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground"><svg class="size-4"><use href="#icon-layers" /></svg></div>
+              <span class="text-sm text-muted-foreground">Nœuds BFS</span>
+            </div>
+            <svg class="size-4 text-muted-foreground"><use href="#icon-more" /></svg>
+          </div>
+          <p id="stat-bfs-nodes" class="mt-4 text-[32px] font-extrabold leading-none tracking-tight tabular-nums">0</p>
+          <p class="mt-2 text-[11px] text-muted-foreground">Nœuds explorés au dernier run</p>
+        </div>
+
+        <div class="rounded-2xl border border-border p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="grid size-9 place-items-center rounded-lg bg-accent text-accent-foreground"><svg class="size-4"><use href="#icon-sparkles" /></svg></div>
+              <span class="text-sm text-muted-foreground">Nœuds A*</span>
+            </div>
+            <svg class="size-4 text-muted-foreground"><use href="#icon-more" /></svg>
+          </div>
+          <p id="stat-astar-nodes" class="mt-4 text-[32px] font-extrabold leading-none tracking-tight tabular-nums">0</p>
+          <p class="mt-2 text-[11px] text-muted-foreground">Nœuds explorés au dernier run</p>
+        </div>
+      </section>
+
+      <section id="implementation" class="scroll-mt-24 rounded-2xl border border-border p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="flex gap-3">
+            <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground"><svg class="size-[18px]"><use href="#icon-sliders" /></svg></div>
+            <div>
+              <h2 class="text-lg font-bold">Implémentation</h2>
+              <p class="mt-0.5 text-sm text-muted-foreground">Configurez la grille et les paramètres des algorithmes.</p>
+            </div>
+          </div>
+          <button id="btn-random" class="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted">
+            <svg class="size-4"><use href="#icon-shuffle" /></svg>
+            Grille aléatoire
+          </button>
+        </div>
+
+        <div class="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-5 md:grid-cols-2 xl:grid-cols-3">
+          <div>
+            <label for="size-input" class="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">Taille</label>
+            <input id="size-input" type="number" min="10" max="100" value="30" class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20" />
+            <p class="mt-1.5 text-[11px] text-muted-foreground">Entre 10 et 100 cellules</p>
+          </div>
+
+          <div>
+            <div class="mb-1.5 flex items-center justify-between gap-2">
+              <label for="density-input" class="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">Densité de murs</label>
+              <span id="density-val" class="rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-semibold text-muted-foreground">20%</span>
+            </div>
+            <input id="density-input" type="range" min="0" max="35" value="20" class="w-full" />
+            <p class="mt-1.5 text-[11px] text-muted-foreground">Proportion de cases bloquées</p>
+          </div>
+
+          <div>
+            <label for="seed-input" class="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">Seed</label>
+            <input id="seed-input" type="text" placeholder="Vide = aléatoire" class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20" />
+            <p class="mt-1.5 text-[11px] text-muted-foreground">Reproduit la même grille</p>
+          </div>
+
+          <div>
+            <label for="heuristic-select" class="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">Heuristique A*</label>
+            <select id="heuristic-select" class="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-ring focus:ring-2 focus:ring-ring/20">
+              <option value="manhattan" selected>manhattan</option>
+              <option value="euclidean">euclidean</option>
+              <option value="chebyshev">chebyshev</option>
+              <option value="zero">zero</option>
+            </select>
+            <p class="mt-1.5 text-[11px] text-muted-foreground">Estimation du coût restant</p>
+          </div>
+
+          <div>
+            <div class="mb-1.5 flex items-center justify-between gap-2">
+              <label for="speed-input" class="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">Vitesse d'animation</label>
+              <span id="speed-val" class="rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-semibold text-muted-foreground">50</span>
+            </div>
+            <input id="speed-input" type="range" min="10" max="100" value="50" class="w-full" />
+            <p class="mt-1.5 text-[11px] text-muted-foreground">De lent à rapide</p>
+          </div>
+        </div>
+
+        <div class="mt-5 flex flex-wrap items-center gap-2 border-t border-border pt-5">
+          <button id="btn-generate" class="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted disabled:opacity-50">
+            <svg class="size-4"><use href="#icon-refresh" /></svg>
+            Générer
+          </button>
+          <button id="btn-bfs" class="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted disabled:opacity-50">
+            <svg class="size-4"><use href="#icon-play" /></svg>
+            Lancer BFS
+          </button>
+          <button id="btn-astar" class="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-muted disabled:opacity-50">
+            <svg class="size-4"><use href="#icon-sparkles" /></svg>
+            Lancer A*
+          </button>
+          <button id="btn-compare" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50">
+            <svg class="size-4"><use href="#icon-compare" /></svg>
+            Comparer les deux
+          </button>
+          <button id="btn-reset" class="inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50">
+            Réinitialiser
+          </button>
+        </div>
+      </section>
+
+      <section id="visualisation" class="scroll-mt-24 rounded-2xl border border-border p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="flex gap-3">
+            <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground"><svg class="size-[18px]"><use href="#icon-grid" /></svg></div>
+            <div>
+              <h2 class="text-lg font-bold">Visualisation du parcours</h2>
+              <p class="mt-0.5 text-sm text-muted-foreground">Suivez l'exploration des nœuds et le chemin trouvé, côte à côte.</p>
+            </div>
+          </div>
+          <div class="inline-flex items-center gap-1 rounded-xl border border-border bg-card p-1">
+            <button id="mode-wall" data-mode="wall" class="mode-btn is-active rounded-lg border border-transparent px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground">Mur</button>
+            <button id="mode-start" data-mode="start" class="mode-btn rounded-lg border border-transparent px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground">Départ</button>
+            <button id="mode-goal" data-mode="goal" class="mode-btn rounded-lg border border-transparent px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground">Arrivée</button>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-6 border-t border-border pt-5 md:grid-cols-2">
+          <div class="rounded-2xl border border-border p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="size-2.5 rounded-full bg-[#2f6fd0]"></span>
+                <h3 class="font-bold">BFS</h3>
+              </div>
+              <span class="rounded-full bg-accent px-2 py-1 text-[11px] font-semibold text-accent-foreground">Breadth-first</span>
+            </div>
+            <div class="mt-3 overflow-hidden rounded-xl border border-border bg-card">
+              <canvas id="canvas-bfs" class="block w-full"></canvas>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Nœuds</p><p id="bfs-nodes" class="mt-0.5 text-sm font-bold tabular-nums">0</p></div>
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Temps</p><p id="bfs-time" class="mt-0.5 text-sm font-bold tabular-nums">—</p></div>
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Longueur</p><p id="bfs-len" class="mt-0.5 text-sm font-bold tabular-nums">—</p></div>
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">État</p><p id="bfs-state" class="mt-0.5 truncate text-sm font-bold">idle</p></div>
+            </div>
+            <button id="btn-pause-bfs" class="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted">
+              <svg class="size-4"><use href="#icon-pause" /></svg>
+              <span data-label>Pause</span>
+            </button>
+          </div>
+
+          <div class="rounded-2xl border border-border p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="size-2.5 rounded-full bg-[#2f9e63]"></span>
+                <h3 class="font-bold">A*</h3>
+              </div>
+              <span class="rounded-full bg-success-soft px-2 py-1 text-[11px] font-semibold text-success">Heuristique</span>
+            </div>
+            <div class="mt-3 overflow-hidden rounded-xl border border-border bg-card">
+              <canvas id="canvas-astar" class="block w-full"></canvas>
+            </div>
+            <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Nœuds</p><p id="astar-nodes" class="mt-0.5 text-sm font-bold tabular-nums">0</p></div>
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Temps</p><p id="astar-time" class="mt-0.5 text-sm font-bold tabular-nums">—</p></div>
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Longueur</p><p id="astar-len" class="mt-0.5 text-sm font-bold tabular-nums">—</p></div>
+              <div class="rounded-lg bg-muted px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">État</p><p id="astar-state" class="mt-0.5 truncate text-sm font-bold">idle</p></div>
+            </div>
+            <button id="btn-pause-astar" class="mt-3 inline-flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted">
+              <svg class="size-4"><use href="#icon-pause" /></svg>
+              <span data-label>Pause</span>
+            </button>
+          </div>
+        </div>
+
+        <p class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl bg-muted px-4 py-3 text-[11px] text-muted-foreground">
+          <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background:#ffffff;box-shadow:inset 0 0 0 1px #e3e8f0"></span>Libre</span>
+          <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background:#223047"></span>Murs</span>
+          <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background:#dbeafe"></span>Explorés</span>
+          <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background:#2f6fd0"></span>Chemin</span>
+          <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background:#2f9e63"></span>Départ</span>
+          <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm" style="background:#c98a1e"></span>Arrivée</span>
+          <span class="sm:ml-auto">Clic / glisser pour modifier la grille.</span>
+        </p>
+      </section>
+
+      <section id="comparaison" class="scroll-mt-24 rounded-2xl border border-border p-6">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="flex gap-3">
+            <div class="grid size-10 shrink-0 place-items-center rounded-xl bg-accent text-accent-foreground"><svg class="size-[18px]"><use href="#icon-chart" /></svg></div>
+            <div>
+              <h2 class="text-lg font-bold">Tableau comparatif des performances</h2>
+              <p class="mt-0.5 text-sm text-muted-foreground">Historique des runs : nœuds explorés, temps et longueur du chemin.</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-benchmark" class="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50">
+              <svg class="size-4"><use href="#icon-gauge" /></svg>
+              Benchmark rapide
+            </button>
+            <button id="btn-clear-history" class="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted disabled:opacity-50">
+              <svg class="size-4"><use href="#icon-trash" /></svg>
+              Effacer
+            </button>
+            <button id="btn-export-csv" class="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-semibold transition-colors hover:bg-muted disabled:opacity-50">
+              <svg class="size-4"><use href="#icon-download" /></svg>
+              Exporter en CSV
+            </button>
+          </div>
+        </div>
+
+        <div id="progress-bar" class="mt-4 hidden w-full md:flex-1">
+          <div class="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div id="progress-fill" class="h-2 rounded-full bg-primary transition-[width] duration-300" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="mt-4 overflow-hidden rounded-2xl border border-border">
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[900px] text-sm">
+              <thead>
+                <tr class="bg-muted text-left text-xs text-muted-foreground">
+                  <th class="rounded-l-lg px-4 py-3 font-medium">Grille</th>
+                  <th class="px-4 py-3 font-medium">Densité</th>
+                  <th class="px-4 py-3 font-medium">Seed</th>
+                  <th class="px-4 py-3 font-medium">Algo</th>
+                  <th class="px-4 py-3 font-medium">Heuristique</th>
+                  <th class="px-4 py-3 text-center font-medium">Nœuds explorés</th>
+                  <th class="px-4 py-3 text-center font-medium">Temps (ms)</th>
+                  <th class="px-4 py-3 text-center font-medium">Longueur chemin</th>
+                  <th class="rounded-r-lg px-4 py-3 text-center font-medium">Réduction %</th>
+                </tr>
+              </thead>
+              <tbody id="perf-body">
+                <tr><td colspan="9" class="px-4 py-8 text-center text-muted-foreground">Aucune donnée</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="charts" class="mt-6 grid gap-6 md:grid-cols-2">
+          <div class="rounded-2xl border border-border p-5">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold">Nœuds explorés</h3>
+              <span class="text-[11px] text-muted-foreground">BFS vs A*</span>
+            </div>
+            <div class="mt-4 h-[260px]"><canvas id="chart-nodes"></canvas></div>
+            <div id="chart-nodes-msg" class="mt-2 text-sm text-muted-foreground"></div>
+          </div>
+          <div class="rounded-2xl border border-border p-5">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-bold">Temps d'exécution</h3>
+              <span class="text-[11px] text-muted-foreground">En millisecondes</span>
+            </div>
+            <div class="mt-4 h-[260px]"><canvas id="chart-time"></canvas></div>
+            <div id="chart-time-msg" class="mt-2 text-sm text-muted-foreground"></div>
+          </div>
+        </div>
+
+        <div id="observation" class="mt-4 rounded-xl border border-border bg-accent px-4 py-3 text-sm text-accent-foreground"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="/static/ui.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>
